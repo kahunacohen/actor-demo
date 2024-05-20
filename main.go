@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"time"
 )
 
 type MessageType int
@@ -19,44 +21,65 @@ type Message struct {
 	Type    MessageType
 }
 
-type Actor struct {
-	inbx chan Message
+type Actor interface {
+	Send(inbx chan Message)
+	Receive()
 }
 
-func NewActor() Actor {
-	return Actor{inbx: make(chan Message)}
+type BaseActor struct {
+	Inbx     chan Message
+	handlers map[MessageType]func(msg Message)
 }
 
-func (a *Actor) Receive() {
-	for msg := range a.inbx {
-		fmt.Printf("receiving: %v", msg)
+func NewBaseActor() BaseActor {
+	return BaseActor{
+		Inbx:     make(chan Message, 10),
+		handlers: make(map[MessageType]func(msg Message)),
 	}
 }
 
-func (a *Actor) Send(msg Message) {
-	a.inbx <- msg
+func (ba *BaseActor) RegisterHandler(msgType MessageType, handler func(msg Message)) {
+	// TODO make threadsafe
+	ba.handlers[msgType] = handler
+}
+
+func (ba *BaseActor) Receive() {
+	fmt.Println("receive")
+	for msg := range ba.Inbx {
+		handler, found := ba.handlers[msg.Type]
+		if found {
+			handler(msg)
+		} else {
+			log.Printf("handler not found for type %v", msg.Type)
+		}
+	}
+}
+
+func (ba *BaseActor) Send(msg Message) {
+	ba.Inbx <- msg
 }
 
 type EmployeeActor struct {
-	Actor
-	Name string
-}
-
-func (e *EmployeeActor) UpdateHomeVisitNotes(patient PatientActor, msg Message) {
-	//patient.Send(fmt.Sprintf("updating home visit notes: %s\n", notes))
+	BaseActor
 }
 
 type PatientActor struct {
-	Actor
-	Name string
+	BaseActor
 }
 
 func main() {
-	employee := EmployeeActor{Actor: NewActor(), Name: "Shai"}
-	patient := PatientActor{Actor: NewActor(), Name: "Aaron"}
+	// Instantiate employee and patient actors.
+	fmt.Println("main")
+	employee := EmployeeActor{NewBaseActor()}
+	patient := PatientActor{NewBaseActor()}
+	patient.RegisterHandler(CreateHomeVisitNotes, func(msg Message) { fmt.Println("doing it") })
+
+	// Start them listening
 	go patient.Receive()
 
-	// Maybe an actor should be an interface that satisfies Receives and dispatches. But how to avoid duplication?
-	employee.Send(patient, Message{Id: 1, Payload: "saw him today", Type: CreateHomeVisitNotes})
-	employee.Send(patient, Message{Id: 2, Payload: "she wasn't feeling well", Type: CreateHomeVisitNotes})
+	// Send some messages
+	employee.Send(Message{Id: 1, Payload: "saw him today", Type: CreateHomeVisitNotes})
+	employee.Send(Message{Id: 2, Payload: "saw him today", Type: CreateHomeVisitNotes})
+	employee.Send(Message{Id: 3, Payload: "saw him today", Type: CreateHomeVisitNotes})
+	time.Sleep(5 * time.Second)
 }
