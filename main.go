@@ -4,12 +4,27 @@ import (
 	"fmt"
 )
 
+type MessageType int
+
+const (
+	CreateHomeVisitNotes MessageType = iota
+	UpdatePatientRecord
+	ScheduleAppointment
+	CancelAppointment
+)
+
+type Message struct {
+	Id      int
+	Payload interface{}
+	Type    MessageType
+}
+
 type Actor struct {
-	inbx chan string
+	inbx chan Message
 }
 
 func NewActor() Actor {
-	return Actor{inbx: make(chan string)}
+	return Actor{inbx: make(chan Message)}
 }
 
 func (a *Actor) Receive() {
@@ -18,7 +33,7 @@ func (a *Actor) Receive() {
 	}
 }
 
-func (a *Actor) Send(msg string) {
+func (a *Actor) Send(msg Message) {
 	a.inbx <- msg
 }
 
@@ -27,8 +42,8 @@ type EmployeeActor struct {
 	Name string
 }
 
-func (e *EmployeeActor) UpdateHomeVisitNotes(patient PatientActor, notes string) {
-	patient.Send(fmt.Sprintf("updating home visit notes: %s\n", notes))
+func (e *EmployeeActor) UpdateHomeVisitNotes(patient PatientActor, msg Message) {
+	//patient.Send(fmt.Sprintf("updating home visit notes: %s\n", notes))
 }
 
 type PatientActor struct {
@@ -40,5 +55,8 @@ func main() {
 	employee := EmployeeActor{Actor: NewActor(), Name: "Shai"}
 	patient := PatientActor{Actor: NewActor(), Name: "Aaron"}
 	go patient.Receive()
-	employee.UpdateHomeVisitNotes(patient, "saw him today")
+
+	// Maybe an actor should be an interface that satisfies Receives and dispatches. But how to avoid duplication?
+	employee.Send(patient, Message{Id: 1, Payload: "saw him today", Type: CreateHomeVisitNotes})
+	employee.Send(patient, Message{Id: 2, Payload: "she wasn't feeling well", Type: CreateHomeVisitNotes})
 }
