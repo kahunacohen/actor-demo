@@ -5,7 +5,7 @@ import "log"
 type MessageType int
 
 const (
-	CreateHomeVisitNotes MessageType = iota
+	MHomeVisit MessageType = iota
 	UpdatePatientRecord
 	ScheduleAppointment
 	CancelAppointment
@@ -17,26 +17,26 @@ type Message struct {
 	Type    MessageType
 }
 
-type BaseActor struct {
+type Base struct {
 	Inbx     chan Message
 	handlers map[MessageType]func(msg Message)
 }
 
-func NewBaseActor() BaseActor {
-	return BaseActor{
+func NewBase() Base {
+	return Base{
 		Inbx:     make(chan Message, 10),
 		handlers: make(map[MessageType]func(msg Message)),
 	}
 }
 
-func (ba *BaseActor) RegisterHandler(msgType MessageType, handler func(msg Message)) {
+func (b *Base) RegisterHandler(msgType MessageType, handler func(msg Message)) {
 	// TODO make threadsafe
-	ba.handlers[msgType] = handler
+	b.handlers[msgType] = handler
 }
 
-func (ba *BaseActor) Receive() {
-	for msg := range ba.Inbx {
-		handler, found := ba.handlers[msg.Type]
+func (b *Base) Receive() {
+	for msg := range b.Inbx {
+		handler, found := b.handlers[msg.Type]
 		if found {
 			handler(msg)
 		} else {
@@ -45,6 +45,6 @@ func (ba *BaseActor) Receive() {
 	}
 }
 
-func (ba *BaseActor) Send(msg Message) {
-	ba.Inbx <- msg
+func (b *Base) Send(msg Message) {
+	b.Inbx <- msg
 }
