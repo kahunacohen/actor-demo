@@ -44,7 +44,6 @@ func (ba *BaseActor) RegisterHandler(msgType MessageType, handler func(msg Messa
 }
 
 func (ba *BaseActor) Receive() {
-	fmt.Println("receive")
 	for msg := range ba.Inbx {
 		handler, found := ba.handlers[msg.Type]
 		if found {
@@ -65,21 +64,28 @@ type EmployeeActor struct {
 
 type PatientActor struct {
 	BaseActor
+	Id int
 }
 
 func main() {
 	// Instantiate employee and patient actors.
-	fmt.Println("main")
-	employee := EmployeeActor{NewBaseActor()}
-	patient := PatientActor{NewBaseActor()}
-	patient.RegisterHandler(CreateHomeVisitNotes, func(msg Message) { fmt.Println("doing it") })
+	// employee := EmployeeActor{NewBaseActor()}
+	patient := PatientActor{BaseActor: NewBaseActor(), Id: 1}
+	patient.RegisterHandler(CreateHomeVisitNotes, func(msg Message) {
+		fmt.Printf("Doing some expensive operation on patient: %d using %v\n", msg.Id, msg.Payload)
+		time.Sleep(1 * time.Second)
+	})
+	patient2 := PatientActor{BaseActor: NewBaseActor(), Id: 2}
+	patient2.RegisterHandler(CreateHomeVisitNotes, func(msg Message) {
+		fmt.Printf("Doing some expensive operation on patient: %d using %v\n", msg.Id, msg.Payload)
+		time.Sleep(1 * time.Second)
+	})
 
-	// Start them listening
 	go patient.Receive()
+	go patient2.Receive()
 
 	// Send some messages
-	employee.Send(Message{Id: 1, Payload: "saw him today", Type: CreateHomeVisitNotes})
-	employee.Send(Message{Id: 2, Payload: "saw him today", Type: CreateHomeVisitNotes})
-	employee.Send(Message{Id: 3, Payload: "saw him today", Type: CreateHomeVisitNotes})
-	time.Sleep(5 * time.Second)
+	patient.Send(Message{Id: 1, Payload: "arbitrary data", Type: CreateHomeVisitNotes})
+	patient2.Send(Message{Id: 2, Payload: "arbitrary data", Type: CreateHomeVisitNotes})
+	time.Sleep(3 * time.Second)
 }
