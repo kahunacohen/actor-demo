@@ -68,24 +68,15 @@ type PatientActor struct {
 }
 
 func main() {
-	// Instantiate employee and patient actors.
-	// employee := EmployeeActor{NewBaseActor()}
-	patient := PatientActor{BaseActor: NewBaseActor(), Id: 1}
-	patient.RegisterHandler(CreateHomeVisitNotes, func(msg Message) {
-		fmt.Printf("Doing some expensive operation on patient: %d using %v\n", msg.Id, msg.Payload)
-		time.Sleep(1 * time.Second)
-	})
-	patient2 := PatientActor{BaseActor: NewBaseActor(), Id: 2}
-	patient2.RegisterHandler(CreateHomeVisitNotes, func(msg Message) {
-		fmt.Printf("Doing some expensive operation on patient: %d using %v\n", msg.Id, msg.Payload)
-		time.Sleep(1 * time.Second)
-	})
-
-	go patient.Receive()
-	go patient2.Receive()
-
-	// Send some messages
-	patient.Send(Message{Id: 1, Payload: "arbitrary data", Type: CreateHomeVisitNotes})
-	patient2.Send(Message{Id: 2, Payload: "arbitrary data", Type: CreateHomeVisitNotes})
+	// Create a few patient actors
+	for i := 0; i <= 5; i++ {
+		p := PatientActor{BaseActor: NewBaseActor(), Id: i}
+		p.RegisterHandler(CreateHomeVisitNotes, func(msg Message) {
+			fmt.Printf("Doing some expensive operation on patient: %d using %v\n", msg.Id, msg.Payload)
+			time.Sleep(1 * time.Second)
+		})
+		go p.Receive()
+		p.Send(Message{Id: i, Payload: "arbitrary data", Type: CreateHomeVisitNotes})
+	}
 	time.Sleep(3 * time.Second)
 }
