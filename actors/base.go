@@ -1,23 +1,23 @@
 package actors
 
 import (
-	"github/kahunacohen/actor-demo/messages"
+	ms "github/kahunacohen/actor-demo/messages"
 	"log"
 )
 
 type Base struct {
-	Inbx     chan messages.Message
-	handlers map[messages.MessageType]func(msg messages.Message)
+	Inbx     chan ms.Message
+	handlers map[ms.MessageType]func(msg ms.Message)
 }
 
 func NewBase() Base {
 	return Base{
-		Inbx:     make(chan messages.Message, 10),
-		handlers: make(map[messages.MessageType]func(msg messages.Message)),
+		Inbx:     make(chan ms.Message, 16),
+		handlers: make(map[ms.MessageType]func(msg ms.Message)),
 	}
 }
 
-func (b *Base) RegisterHandler(msgType messages.MessageType, handler func(msg messages.Message)) {
+func (b *Base) RegisterHandler(msgType ms.MessageType, handler func(msg ms.Message)) {
 	// TODO make threadsafe
 	b.handlers[msgType] = handler
 }
@@ -33,6 +33,6 @@ func (b *Base) Receive() {
 	}
 }
 
-func (b *Base) Send(msg messages.Message) {
+func (b *Base) Send(msg ms.Message) {
 	b.Inbx <- msg
 }
