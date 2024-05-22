@@ -10,7 +10,7 @@ import (
 func main() {
 	// Create a few patient actors
 	for i := 1; i <= 25; i++ {
-		patient := actors.Patient{Base: actors.NewBase(), Id: i}
+		patient := actors.NewPatient(i)
 		patient.RegisterHandler(ms.CreateHomeVisit, actors.MakeHomeVisit)
 		go patient.Receive()
 		patient.Send(ms.Message{Id: i, Payload: "arbitrary data", Type: ms.CreateHomeVisit})
