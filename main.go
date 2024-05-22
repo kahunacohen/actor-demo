@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	// Create a few patient actors
+	// Create 25 patients
 	for i := 1; i <= 25; i++ {
 		patient := actors.NewPatient(i)
 		go patient.Receive()
