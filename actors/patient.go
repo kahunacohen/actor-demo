@@ -18,6 +18,6 @@ func NewPatient(id int) Patient {
 }
 
 func CreatePatientHandler(msg ms.Message) {
-	log.Printf("Creating patient %d using %v\n", msg.Id, msg.Payload)
+	log.Printf("Creating patient with message ID: %s using %v\n", msg.Id, msg.Payload)
 	time.Sleep(1 * time.Second)
 }

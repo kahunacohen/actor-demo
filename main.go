@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"time"
 
 	"github/kahunacohen/actor-demo/actors"
@@ -12,7 +13,11 @@ func main() {
 	for i := 1; i <= 25; i++ {
 		patient := actors.NewPatient(i)
 		go patient.Receive()
-		patient.Send(ms.Message{Id: i, Payload: "arbitrary data", Type: ms.CreatePatientMessage})
+		msg, err := ms.NewMessage(ms.CreatePatientMessage, "arbitrary data")
+		if err != nil {
+			log.Fatal("Could not create message")
+		}
+		patient.Send(*msg)
 	}
 	time.Sleep(1 * time.Second)
 }
