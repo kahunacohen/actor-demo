@@ -4,15 +4,16 @@ import (
 	"time"
 
 	"github/kahunacohen/actor-demo/actors"
+	"github/kahunacohen/actor-demo/messages"
 )
 
 func main() {
 	// Create a few patient actors
 	for i := 1; i <= 6; i++ {
 		patient := actors.Patient{Base: actors.NewBase(), Id: i}
-		patient.RegisterHandler(actors.MHomeVisit, actors.MakeHomeVisit)
+		patient.RegisterHandler(messages.CreateHomeVisit, actors.MakeHomeVisit)
 		go patient.Receive()
-		patient.Send(actors.Message{Id: i, Payload: "arbitrary data", Type: actors.MHomeVisit})
+		patient.Send(messages.Message{Id: i, Payload: "arbitrary data", Type: messages.CreateHomeVisit})
 	}
 	time.Sleep(3 * time.Second)
 }

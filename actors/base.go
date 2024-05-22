@@ -1,35 +1,23 @@
 package actors
 
-import "log"
-
-type MessageType int
-
-const (
-	MHomeVisit MessageType = iota
-	UpdatePatientRecord
-	ScheduleAppointment
-	CancelAppointment
+import (
+	"github/kahunacohen/actor-demo/messages"
+	"log"
 )
 
-type Message struct {
-	Id      int
-	Payload interface{}
-	Type    MessageType
-}
-
 type Base struct {
-	Inbx     chan Message
-	handlers map[MessageType]func(msg Message)
+	Inbx     chan messages.Message
+	handlers map[messages.MessageType]func(msg messages.Message)
 }
 
 func NewBase() Base {
 	return Base{
-		Inbx:     make(chan Message, 10),
-		handlers: make(map[MessageType]func(msg Message)),
+		Inbx:     make(chan messages.Message, 10),
+		handlers: make(map[messages.MessageType]func(msg messages.Message)),
 	}
 }
 
-func (b *Base) RegisterHandler(msgType MessageType, handler func(msg Message)) {
+func (b *Base) RegisterHandler(msgType messages.MessageType, handler func(msg messages.Message)) {
 	// TODO make threadsafe
 	b.handlers[msgType] = handler
 }
@@ -45,6 +33,6 @@ func (b *Base) Receive() {
 	}
 }
 
-func (b *Base) Send(msg Message) {
+func (b *Base) Send(msg messages.Message) {
 	b.Inbx <- msg
 }
