@@ -3,10 +3,7 @@ package messages
 type MessageType int
 
 const (
-	CancelAppointment MessageType = iota
-	CreateHomeVisit
-	ScheduleAppointment
-	UpdatePatientRecord
+	CreatePatientMessage MessageType = iota
 )
 
 type Message struct {

@@ -13,7 +13,7 @@ type Patient struct {
 
 func NewPatient(id int) Patient {
 	p := Patient{Base: NewBase(), Id: id}
-	p.RegisterHandler(ms.CreateHomeVisit, CreateHomeVisitHandler)
+	p.RegisterHandler(ms.CreatePatientMessage, CreateHomeVisitHandler)
 	return p
 }
 
