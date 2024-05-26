@@ -13,11 +13,11 @@ type Patient struct {
 
 func NewPatient(id int) Patient {
 	p := Patient{Base: NewBase(), Id: id}
-	p.RegisterHandler(ms.CreatePatientMessage, CreatePatientHandler)
+	p.RegisterHandler(ms.CreatePatientMessage, p.CreatePatientHandler)
 	return p
 }
 
-func CreatePatientHandler(msg ms.Message) {
-	log.Printf("Creating patient with message ID: %s using %v\n", msg.Id, msg.Payload)
+func (p Patient) CreatePatientHandler(msg ms.Message) {
+	log.Printf("Creating patient actor: %v\n", p.Address)
 	time.Sleep(1 * time.Second)
 }

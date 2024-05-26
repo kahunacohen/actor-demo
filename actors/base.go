@@ -1,17 +1,25 @@
 package actors
 
 import (
+	"fmt"
 	ms "github/kahunacohen/actor-demo/messages"
 	"log"
+	"os"
+
+	"github.com/google/uuid"
 )
 
 type Base struct {
+	Address  string
 	Inbx     chan ms.Message
 	handlers map[ms.MessageType]func(msg ms.Message)
 }
 
 func NewBase() Base {
+	host, _ := os.Hostname()
+	uuid, _ := uuid.NewRandom()
 	return Base{
+		Address:  fmt.Sprintf("%s@%s", uuid, host),
 		Inbx:     make(chan ms.Message, 16),
 		handlers: make(map[ms.MessageType]func(msg ms.Message)),
 	}
