@@ -7,6 +7,7 @@ type MessageType int
 const (
 	CreatePatientMessage MessageType = iota
 	CreateActorMessage
+	RequestAllPatientsMessage
 )
 
 type Message struct {

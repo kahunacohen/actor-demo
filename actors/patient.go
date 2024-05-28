@@ -2,7 +2,6 @@ package actors
 
 import (
 	ms "github/kahunacohen/actor-demo/messages"
-	"log"
 	"time"
 )
 
@@ -25,6 +24,5 @@ func NewPatient(data PatientData) Patient {
 }
 
 func (p Patient) CreatePatientHandler(msg ms.Message) {
-	log.Printf("Creating patient actor: %v\n", p.Address)
 	time.Sleep(1 * time.Second)
 }
