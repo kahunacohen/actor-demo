@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 
 	"github/kahunacohen/actor-demo/actors"
 	ms "github/kahunacohen/actor-demo/messages"
@@ -10,14 +9,18 @@ import (
 
 func main() {
 	// Create 25 patients
+	system := actors.NewSystem()
+	go system.Receive()
 	for i := 1; i <= 25; i++ {
-		patient := actors.NewPatient(i)
-		go patient.Receive()
-		msg, err := ms.NewMessage(ms.CreatePatientMessage, "arbitrary data")
-		if err != nil {
-			log.Fatal("Could not create message")
-		}
-		patient.Send(*msg)
+		//  	patient := actors.NewPatient(i)
+		//  	go patient.Receive()
+		msg, _ := ms.NewMessage[actors.Patient](ms.CreateActorMessage, actors.Patient{FirstName: "Aaron", LastName: "Cohen", LocalID: "341077360"})
+		system.Send(*msg)
+
+		//  	if err != nil {
+		//  		log.Fatal("Could not create message")
+		//  	}
+		//  	patient.Send(*msg)
 	}
 	fmt.Println("Press Enter to exit...")
 	fmt.Scanln()

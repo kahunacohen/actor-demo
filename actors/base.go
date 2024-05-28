@@ -9,6 +9,11 @@ import (
 	"github.com/google/uuid"
 )
 
+type Actor interface {
+	Receive()
+	Send(msg ms.Message)
+}
+
 type Base struct {
 	Address  string
 	Inbx     chan ms.Message

@@ -8,7 +8,10 @@ import (
 
 type Patient struct {
 	Base
-	Id int
+	FirstName string
+	LastName  string
+	LocalID   string
+	Id        int
 }
 
 func NewPatient(id int) Patient {

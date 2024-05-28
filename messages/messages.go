@@ -6,6 +6,7 @@ type MessageType int
 
 const (
 	CreatePatientMessage MessageType = iota
+	CreateActorMessage
 )
 
 type Message struct {
@@ -14,7 +15,7 @@ type Message struct {
 	Type    MessageType
 }
 
-func NewMessage(messageType MessageType, payload interface{}) (*Message, error) {
+func NewMessage[T any](messageType MessageType, payload T) (*Message, error) {
 	uuid, err := uuid.NewRandom()
 	if err != nil {
 		return nil, err
