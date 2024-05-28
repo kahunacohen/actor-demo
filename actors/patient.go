@@ -6,17 +6,21 @@ import (
 	"time"
 )
 
-type Patient struct {
-	Base
+type PatientData struct {
 	FirstName string
 	LastName  string
 	LocalID   string
 	Id        int
 }
 
-func NewPatient(id int) Patient {
-	p := Patient{Base: NewBase(), Id: id}
-	p.RegisterHandler(ms.CreatePatientMessage, p.CreatePatientHandler)
+type Patient struct {
+	Base
+	PatientData
+}
+
+func NewPatient(data PatientData) Patient {
+	p := Patient{Base: NewBase(), PatientData: data}
+	//p.RegisterHandler(ms.CreatePatientMessage, p.CreatePatientHandler)
 	return p
 }
 

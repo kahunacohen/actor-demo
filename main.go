@@ -14,7 +14,7 @@ func main() {
 	for i := 1; i <= 25; i++ {
 		//  	patient := actors.NewPatient(i)
 		//  	go patient.Receive()
-		msg, _ := ms.NewMessage[actors.Patient](ms.CreateActorMessage, actors.Patient{FirstName: "Aaron", LastName: "Cohen", LocalID: "341077360"})
+		msg, _ := ms.NewMessage(ms.CreateActorMessage, actors.PatientData{FirstName: "Aaron", LastName: "Cohen", LocalID: "341077360"})
 		system.Send(*msg)
 
 		//  	if err != nil {
