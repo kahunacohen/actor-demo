@@ -11,17 +11,15 @@ func main() {
 	// Create 25 patients
 	system := actors.NewSystem()
 	go system.Receive()
-	for i := 1; i <= 25; i++ {
-		//  	patient := actors.NewPatient(i)
-		//  	go patient.Receive()
-		msg, _ := ms.NewMessage(ms.CreateActorMessage, actors.PatientData{FirstName: "Aaron", LastName: "Cohen", LocalID: "341077360"})
-		system.Send(*msg)
 
-		//  	if err != nil {
-		//  		log.Fatal("Could not create message")
-		//  	}
-		//  	patient.Send(*msg)
-	}
+	msg, _ := ms.NewMessage(ms.CreateActorMessage, actors.PatientData{FirstName: "Aaron", LastName: "Cohen", LocalID: "341077360"})
+	msg2, _ := ms.NewMessage(ms.CreateActorMessage, actors.PatientData{FirstName: "Courtney", LastName: "Cohen", LocalID: "341077361"})
+	msg3, _ := ms.NewMessage(ms.CreateActorMessage, actors.PatientData{FirstName: "Yochanan", LastName: "Harel", LocalID: "341077362"})
+
+	system.Send(*msg)
+	system.Send(*msg2)
+	system.Send(*msg3)
+
 	fmt.Println("Press Enter to exit...")
 	fmt.Scanln()
 }
