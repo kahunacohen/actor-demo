@@ -14,26 +14,31 @@ func NewSystem() System {
 	s.registry = make(map[string]Actor)
 	s.RegisterHandler(CreateActorMessage, s.RegisterActorHandler)
 	s.RegisterHandler(RequestAllPatientsMessage, s.RequestAllPatientsHandler)
+	s.RegisterHandler(ReceiveNewPatientMessage, s.ReceiveNewPatientMessageHandler)
 	return s
 }
 
-func (s System) RegisterActorHandler(msg Message) {
+func (s *System) RegisterActorHandler(msg Message) {
 	if patientData, ok := msg.Payload.(*PatientData); ok {
 		patientActor := NewPatient(*patientData)
 		s.registry[patientActor.Address] = &patientActor
 		log.Printf("registering patient actor: %s", patientActor.Address)
 		// Once registered, send a message back to system with the patient we just created.
-		msg, _ := NewMessage()
-		s.Send()
-
+		msg, _ := NewMessage(ReceiveNewPatientMessage, &patientActor, s)
+		s.Send(*msg)
 	} else {
 		log.Fatalln("failed to get patient data from payload")
 	}
 }
 
-func (s System) RequestAllPatientsHandler(msg Message) {
+func (s *System) RequestAllPatientsHandler(msg Message) {
 	for address, actor := range s.registry {
 		patient, _ := actor.(*Patient)
 		log.Printf("address: %s, actor: %v\n", address, patient.LastName)
 	}
+}
+
+func (s *System) ReceiveNewPatientMessageHandler(msg Message) {
+	log.Println("got it!")
+	log.Println(msg.Payload)
 }

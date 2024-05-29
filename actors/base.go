@@ -14,6 +14,7 @@ const (
 	CreatePatientMessage MessageType = iota
 	CreateActorMessage
 	RequestAllPatientsMessage
+	ReceiveNewPatientMessage
 )
 
 type Actor interface {
