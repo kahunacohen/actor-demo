@@ -2,22 +2,49 @@ package actors
 
 import (
 	"fmt"
-	ms "github/kahunacohen/actor-demo/messages"
 	"log"
 	"os"
 
 	"github.com/google/uuid"
 )
 
+type MessageType int
+
+const (
+	CreatePatientMessage MessageType = iota
+	CreateActorMessage
+	RequestAllPatientsMessage
+)
+
+type Message struct {
+	Id      string
+	Payload interface{}
+	Type    MessageType
+	ReplyTo Actor
+}
+
+func NewMessage[T any](messageType MessageType, payload T) (*Message, error) {
+	uuid, err := uuid.NewRandom()
+	if err != nil {
+		return nil, err
+	}
+	return &Message{
+		Id:      uuid.String(),
+		Payload: payload,
+		Type:    messageType,
+	}, nil
+
+}
+
 type Actor interface {
 	Receive()
-	Send(msg ms.Message)
+	Send(msg Message)
 }
 
 type Base struct {
 	Address  string
-	Inbx     chan ms.Message
-	handlers map[ms.MessageType]func(msg ms.Message)
+	Inbx     chan Message
+	handlers map[MessageType]func(msg Message)
 }
 
 func NewBase() Base {
@@ -25,12 +52,12 @@ func NewBase() Base {
 	uuid, _ := uuid.NewRandom()
 	return Base{
 		Address:  fmt.Sprintf("%s@%s", uuid, host),
-		Inbx:     make(chan ms.Message, 16),
-		handlers: make(map[ms.MessageType]func(msg ms.Message)),
+		Inbx:     make(chan Message, 16),
+		handlers: make(map[MessageType]func(msg Message)),
 	}
 }
 
-func (b *Base) RegisterHandler(msgType ms.MessageType, handler func(msg ms.Message)) {
+func (b *Base) RegisterHandler(msgType MessageType, handler func(msg Message)) {
 	// TODO make threadsafe
 	b.handlers[msgType] = handler
 }
@@ -46,6 +73,6 @@ func (b *Base) Receive() {
 	}
 }
 
-func (b *Base) Send(msg ms.Message) {
+func (b *Base) Send(msg Message) {
 	b.Inbx <- msg
 }

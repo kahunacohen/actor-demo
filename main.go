@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github/kahunacohen/actor-demo/actors"
-	ms "github/kahunacohen/actor-demo/messages"
 )
 
 func main() {
@@ -22,13 +21,13 @@ func main() {
 
 	// Create the messages and send them to the system
 	for i := range patientsToCreate {
-		msg, _ := ms.NewMessage(ms.CreateActorMessage, &patientsToCreate[i])
+		msg, _ := actors.NewMessage(actors.CreateActorMessage, &patientsToCreate[i])
 		system.Send(*msg)
 	}
 
 	// Now get all actors back and persist each one
 	var payload interface{}
-	requestPatientsMsg, _ := ms.NewMessage(ms.RequestAllPatientsMessage, payload)
+	requestPatientsMsg, _ := actors.NewMessage(actors.RequestAllPatientsMessage, payload)
 	system.Send(*requestPatientsMsg)
 
 	fmt.Println("Press Enter to exit...")

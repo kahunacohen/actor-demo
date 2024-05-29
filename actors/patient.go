@@ -1,7 +1,6 @@
 package actors
 
 import (
-	ms "github/kahunacohen/actor-demo/messages"
 	"time"
 )
 
@@ -23,6 +22,6 @@ func NewPatient(data PatientData) Patient {
 	return p
 }
 
-func (p Patient) CreatePatientHandler(msg ms.Message) {
+func (p Patient) CreatePatientHandler(msg Message) {
 	time.Sleep(1 * time.Second)
 }
