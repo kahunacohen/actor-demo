@@ -16,14 +16,19 @@ const (
 	RequestAllPatientsMessage
 )
 
+type Actor interface {
+	Receive()
+	Send(msg Message)
+}
+
 type Message struct {
 	Id      string
 	Payload interface{}
 	Type    MessageType
-	ReplyTo Actor
+	ReplyTo *Actor
 }
 
-func NewMessage[T any](messageType MessageType, payload T) (*Message, error) {
+func NewMessage[T any](messageType MessageType, payload T, replyTo Actor) (*Message, error) {
 	uuid, err := uuid.NewRandom()
 	if err != nil {
 		return nil, err
@@ -32,13 +37,9 @@ func NewMessage[T any](messageType MessageType, payload T) (*Message, error) {
 		Id:      uuid.String(),
 		Payload: payload,
 		Type:    messageType,
+		ReplyTo: &replyTo,
 	}, nil
 
-}
-
-type Actor interface {
-	Receive()
-	Send(msg Message)
 }
 
 type Base struct {

@@ -21,6 +21,11 @@ func (s System) RegisterActorHandler(msg Message) {
 	if patientData, ok := msg.Payload.(*PatientData); ok {
 		patientActor := NewPatient(*patientData)
 		s.registry[patientActor.Address] = &patientActor
+		log.Printf("registering patient actor: %s", patientActor.Address)
+		// Once registered, send a message back to system with the patient we just created.
+		msg, _ := NewMessage()
+		s.Send()
+
 	} else {
 		log.Fatalln("failed to get patient data from payload")
 	}
