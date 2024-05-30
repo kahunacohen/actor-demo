@@ -14,7 +14,7 @@ func NewSystem() System {
 	s := System{Base: NewBase()}
 	s.registry = make(map[string]Actor)
 	s.RegisterHandler(ms.CreateActorMessage, s.RegisterActorHandler)
-	s.RegisterHandler(ms.RequestAllPatientsMessage, s.RequestAllPatientsHandler)
+	s.RegisterHandler(ms.PersistAllPatientsMessage, s.PersistAllPatientsHandler)
 	return s
 }
 
@@ -27,9 +27,11 @@ func (s System) RegisterActorHandler(msg ms.Message) {
 	}
 }
 
-func (s System) RequestAllPatientsHandler(msg ms.Message) {
-	for address, actor := range s.registry {
+func (s System) PersistAllPatientsHandler(msg ms.Message) {
+	for _, actor := range s.registry {
 		patient, _ := actor.(*Patient)
-		log.Printf("address: %s, actor: %v\n", address, patient.LastName)
+		go patient.Receive()
+		m, _ := ms.NewMessage(ms.PersistPatientMessage, 1)
+		patient.Send(*m)
 	}
 }
