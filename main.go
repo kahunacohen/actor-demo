@@ -12,8 +12,8 @@ func main() {
 	system := actors.NewSystem()
 	go system.Receive()
 
-	// Here is some patient data.
-	patientsToCreate := []actors.PatientData{
+	// Patient data from outside the system
+	patientsData := []actors.PatientData{
 		{FirstName: "Aaron", LastName: "Cohen", LocalID: "341077360"},
 		{FirstName: "Courtney", LastName: "Cohen", LocalID: "341077361"},
 		{FirstName: "Yochanan", LastName: "Harel", LocalID: "341077362"},
@@ -23,12 +23,13 @@ func main() {
 		{FirstName: "Richard", LastName: "Nixon", LocalID: "341077364"},
 	}
 
-	// Create the messages and send them to the system
-	for i := range patientsToCreate {
-		msg, _ := ms.NewMessage(ms.CreateActorMessage, &patientsToCreate[i])
+	// Register the patients
+	for i := range patientsData {
+		msg, _ := ms.NewMessage(ms.CreateActorMessage, &patientsData[i])
 		system.Send(*msg)
 	}
 
+	// Persist all the patients to the DB
 	var payload interface{}
 	requestPatientsMsg, _ := ms.NewMessage(ms.PersistAllPatientsMessage, payload)
 	system.Send(*requestPatientsMsg)
